@@ -26,7 +26,7 @@ filter' :: (a -> Bool) -> [a] -> [a]
 filter' _ [] = []
 filter' p (x:xs)
   | p x = x : filter p xs  -- predicate zone: if predicate element is True, element is appent in the list.
-  | otherwise = filter p xs -- predicate zone: si no es True, evaluate the next element.
+  | otherwise = filter p xs -- predicate zone: if not True, evaluate the next element.
 
 increment' :: Num a => [a] -> [a]
 increment' [] = []
