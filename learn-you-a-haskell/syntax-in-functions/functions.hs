@@ -30,11 +30,11 @@ filter' p (x:xs)
 
 increment' :: Num a => [a] -> [a]
 increment' [] = []
-increment' lst = map' (\x -> x + 1) lst
+increment' lst = map' (+1) lst
 
 decrement' :: Num a => [a] -> [a]
 decrement' [] = []
-decrement' lst = map' (\x -> x - 1) lst
+decrement' lst = map' (subtract 1) lst
 
 even' :: Integral a => [a] -> [a]
 even' [] = []
