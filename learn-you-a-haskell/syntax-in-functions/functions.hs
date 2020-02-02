@@ -54,3 +54,11 @@ max_other [x] = x
 max_other (x:xs)
   | x > max_other xs = x
   | otherwise = max_other xs
+
+initials :: String -> String -> String
+initials firstname secondname = [f] ++ ". " ++ [l] ++ "."
+  where (f:_) = firstname
+        (l:_) = secondname
+
+bmi :: (RealFloat a) => [(a,a)] -> [a]
+bmi xs = [x | (w,h) <- xs, let x = w / h ^ 2, x <= 5.0]
