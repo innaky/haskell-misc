@@ -4,13 +4,25 @@ import System.Posix.Files
 import System.Posix.Types
 import System.Environment
 
-getTimes :: FilePath -> IO (EpochTime, EpochTime, EpochTime)
-getTimes filePath =
+getAccessTime :: FilePath -> IO (EpochTime)
+getAccessTime filePath =
   do stat <- getFileStatus filePath
-     return (accessTime stat, modificationTime stat, statusChangeTime stat)
+     return (accessTime stat)
+
+getModificationTime :: FilePath -> IO (EpochTime)
+getModificationTime filePath =
+  do stat <- getFileStatus filePath
+     return (modificationTime stat)
+
+getChangeTime :: FilePath -> IO (EpochTime)
+getChangeTime filePath =
+  do stat <- getFileStatus filePath
+     return (statusChangeTime stat)
 
 main :: IO ()
 main = do
   (input:_) <- getArgs
-  outf <- getTimes input
-  print outf
+  accessTime <- getAccessTime input
+  modifTime <- getModificationTime input
+  changeTime <- getChangeTime input
+  print [accessTime, modifTime, changeTime]
