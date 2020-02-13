@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                posixtime
-version:             0.1.0
+version:             0.1.1
 synopsis:            Show the "times" of a file.
 -- description:
 license:             MIT
@@ -19,6 +19,6 @@ executable posixtime
   main-is:             Main.hs
   --other-modules:
   --other-extensions:
-  build-depends:       base >=4.9 && <4.10, unix
+  build-depends:       base >=4.9 && <4.10, unix, time > 1.6
   hs-source-dirs:      src
   default-language:    Haskell2010
