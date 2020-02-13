@@ -1,22 +1,38 @@
 # Posixtime
-This binary return the Access time, modification time and status change time of a file.
+This binary return the __access time__, __modification time__ and __status change time__ of a file.
 
 # Usage
 
 ```bash
-cabal update
-cabal new-build
-./posixtime "/home/foo/file"
-(1581475695,1581475692,1581475692)
+# building
+$ ~> git clone https://github.com/innaky/haskell-misc.git
+$ ~> cd haskel-misc/learn-you-a-haskell/io/posixtime
+$ ~> cabal update
+$ ~> cabal new-build
 
-# Other examples
+# Exec
+./posixtime "/home/foo/Love.jpg"
+"/home/lisper/Love.jpg"	 Access: 2019-10-08 21:46:52.423287501 UTC	 Modify: 2018-05-14 04:14:17.501787194 UTC	 Change: 2018-08-17 21:44:16.479672482 UTC
 
+```
+
+# In a shell script
+
+```bash
+# check directory
+$ ~> cd dir-example
+$ ~> ls
+posixtime  posixtime-tmp
+
+# loop
 for i in $(ls -1)
 do
   ./posixtime $i
 done
 
-(1581476088,1581475944,1581475944)
-(1581475944,1581475944,1581475944)
+# output
+
+"posixtime"	 Access: 2020-02-13 05:31:11.199683948 UTC	 Modify: 2020-02-13 05:30:51.435884439 UTC	 Change: 2020-02-13 05:30:51.435884439 UTC
+"posixtime-tmp"	 Access: 2020-02-13 05:30:51.023888604 UTC	 Modify: 2020-02-13 05:30:50.999888846 UTC	 Change: 2020-02-13 05:30:50.999888846 UTC
 
 ```
