@@ -1,5 +1,15 @@
 # Revision history for posixtime
 
+## 0.1.3 --2020-02-17
+
+	* listDirCompletePathR This function return the absolute path of
+	the files recursively
+	* completePath return the absolute path of the files of a directory
+	* getAccessTimeR return the "accesstime" in UTC format of a files,
+	recursively. Only return the filename of the file.
+	* getAccessTimeFullPathR return the "accesstime" in POSIXTime of a
+	directory recursively and return the absolute filename of the files.
+
 ## 0.1.2 --2020-02-13
 
 * Adding a more readable print output
