@@ -1,5 +1,12 @@
 # Revision history for posixtime
 
+## 0.1.4 --2020-02-18
+	* getTimeL :: FilePath -> IO [(FilePath, UTCTime, UTCTime, UTCTime)]
+	extract the "access time", "change time" and "modification time" of file in the local directory, the filename have the absolute path.
+	* getTimeR :: FilePath -> IO [(FilePath, UTCTime, UTCTime, UTCTime)]
+	extract the "access time", "change time" and "modification time" of file in the local and recursive directories,
+	the filename have the absolute path.
+	
 ## 0.1.3 --2020-02-17
 
 	* listDirCompletePathR This function return the absolute path of
