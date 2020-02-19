@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                posixtime
-version:             0.1.3
+version:             0.1.4
 synopsis:            Show the "times" of a file.
 -- description:
 license:             MIT
