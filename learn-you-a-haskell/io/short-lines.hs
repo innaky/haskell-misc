@@ -1,6 +1,8 @@
-main = do
-  line <- getContents
-  putStrLn $ shortLines line
+--main = do
+--  line <- getContents
+--  putStrLn $ shortLines line
+
+main = interact shortLines
 
 shortLines :: String -> String
 shortLines inputString =
