@@ -13,3 +13,4 @@ the hierarchy of Haskell classes defined in the Prelude and the Prelude types th
 * https://hoogle.haskell.org/
 * https://www.haskell.org/onlinereport/haskell2010/haskell.html
 * http://book.realworldhaskell.org/read/
+* https://github.com/0x0f0f0f/yasih
