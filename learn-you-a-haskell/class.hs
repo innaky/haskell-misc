@@ -5,3 +5,9 @@ class Monad m where
   x >> y = x >>= \_ -> y
   fail :: String -> m a
   fail msg -> error msg
+
+instance Monad Maybe where
+  return x = Just x
+  Nothing >>= f = Nothing
+  Just x >>= f = f x
+  fail _ = Nothing
