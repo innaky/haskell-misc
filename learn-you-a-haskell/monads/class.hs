@@ -16,3 +16,8 @@ instance Monad [] where
   return x = [x]
   xs >>= f = concat (map f xs)
   fail _ = []
+
+-- monad reader
+instance Monad ((->) r) where
+  return x = \_ -> x
+  h >>= f = \w -> f (h w) w
