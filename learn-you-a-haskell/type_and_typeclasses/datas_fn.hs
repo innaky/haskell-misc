@@ -52,3 +52,7 @@ exist a (Tree l b r)
 flatten :: Tree a -> [a]
 flatten (Leaf x) = [x]
 flatten (Node l x r) = flatten l ++ [x] ++ flatten r
+
+-- if action else ???
+isMajorN :: Int -> Int -> Maybe Int
+isMajorN x n = if x > n then Just (x+1) else Nothing
