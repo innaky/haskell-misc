@@ -62,5 +62,20 @@ create tar base paths = BS.readFile tar . write =<< pack base paths
 write :: [Entry] -> LBS.ByteString
 write es = LBS.concat $ map putEntry es ++ [LBS.replicate (512*2) 0]
 
+putEntry :: Entry -> LBS.ByteString
+putEntry entry = case entryContent entry of
+  NormalFile content size       -> LBS.concat [ header, content, padding size ]
+  OtherEntryType _ content size -> LBS.concat [ header, content, padding size ]
+  _                             -> header
+  where
+    header       = putHeader entry
+    padding size = LBS.replicate paddingSize 0
+      where paddingSize = fromIntegral (negate size `mod` 512)
 
+putHeader :: Entry -> LBS.ByteString
+putHeader entry =
+  LBS.Char8.pack $ take 148 block ++ putOct 7 checksum ++ ' ' : drop 156 block
+  where
+    block = putHeaderNoChkSum entry
+    checksum = foldl' (\x y -> x + ord y) 0 block
 
