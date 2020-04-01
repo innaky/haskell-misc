@@ -4,6 +4,7 @@ import qualified Data.ByteString      as BS
 import qualified Data.ByteString.Lazy as LBS
 import Data.Int (Int64)
 import System.Posix.Type (FileMode)
+import qualified Data.ByteString.Char8 as BS.Char8
 
 data Entry = Entry {
   entryTarPath :: {-# UNPACK #-} !TarPath,
@@ -76,6 +77,67 @@ putHeader :: Entry -> LBS.ByteString
 putHeader entry =
   LBS.Char8.pack $ take 148 block ++ putOct 7 checksum ++ ' ' : drop 156 block
   where
-    block = putHeaderNoChkSum entry
+    block    = putHeaderNoChkSum entry
     checksum = foldl' (\x y -> x + ord y) 0 block
 
+putHeaderNoChkSum :: Entry -> String
+putHeaderNoChkSum Entry {
+  entryTarPath     = TarPath name prefix,
+  entryContent     = content,
+  entryPermissions = permissions,
+  entryOwnership   = ownership,
+  entryTime        = modTime,
+  entryFormat      = format
+  } =
+  concat
+  [ putBString 100 $ name
+  , putOct       8 $ permissions
+  , putOct       8 $ ownerId ownership
+  , putOct       8 $ groupId ownership
+  , putOct      12 $ contentSize
+  , putOct       8 $ modTime
+  , fill         8 $ ' '
+  , putChar8       $ typeCode
+  , putBString 100 $ linkTarget
+  ] ++
+  case format of
+    V7Format -> fill 255 '\NUL'
+    UstarFormat -> concat
+      [ putBString   8 $ ustarMagic
+      , putString   32 $ ownerName ownership
+      , putString   32 $ groupName ownership
+      , putOct       8 $ deviceMajor
+      , putOct       8 $ deviceMinor
+      , putBString 155 $ prefix
+      , fill        12 $ '\NUL'
+      ]
+    GNUFormat -> concat
+      [ putBString   8 $ gnuMagic
+      , putString   32 $ ownerName ownership
+      , putString   32 $ groupName ownership
+      , putGnuDev    8 $ deviceMajor
+      , putGnuDev    8 $ deviceMinor
+      , putBString 155 $ prefix
+      , fill        12 $ '\NUL'
+      ]
+    where
+      (typeCode, contentSize, linkTarget,
+       deviceMajor, deviceMinor) = case content of
+        NormalFile  _ size             -> ('0', size, mempty, 0, 0)
+        Directory                      -> ('5', 0, mempty, 0, 0)
+        SymbolicLink (LinkTarget link) -> ('2', 0, link, 0, 0)
+        HardLink (LinkTarget link)     -> ('1', 0, link, 0, 0)
+        CharacterDevice major minor    -> ('3', mempty, major, minor)
+        BlockDevice major minor        -> ('4', 0, mempty, major, minor)
+        NamedPipe                      -> ('6', 0, mempty, 0, 0)
+        OtherEntryType code _ size     -> (code, size, mempty, 0, 0)
+
+      putGnuDev w n = case content of
+        CharacterDevice _ _ -> putOct w n
+        BlockDevice     _ _ -> putOct w n
+        _                   -> replicate w '\NUL'
+
+
+ustarMagic, gnuMagic :: BS.ByteString
+ustarMagic = BS.Char8.pack "ustar\NUL00"
+gnuMagic   = BS.Char8.pack "ustar \NUL"
