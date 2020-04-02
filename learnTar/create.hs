@@ -1,10 +1,17 @@
 module Create where
 
-import qualified Data.ByteString      as BS
-import qualified Data.ByteString.Lazy as LBS
+import Data.Monoid (mempty)
+import Numeric     (showOct)
+import Data.List   (foldl')
+import Data.Char   (ord)
+
+import qualified Data.ByteString       as BS
+import qualified Data.ByteString.Char8 as BS.Char8
+import qualified Data.ByteString.Lazy  as LBS
+import qualified Data.ByteString.Lazy  as LBS.Char8
 import Data.Int (Int64)
 import System.Posix.Type (FileMode)
-import qualified Data.ByteString.Char8 as BS.Char8
+
 
 data Entry = Entry {
   entryTarPath :: {-# UNPACK #-} !TarPath,
@@ -53,12 +60,15 @@ type DevMinor = Int
 type TypeCode = Char
 type Permissions = FileMode
 type EpochTime = Int64
+type FieldWidth = Int
 
 newtype LinkTarget = LinkTarget BS.ByteString
  deriving (Eq, Ord, Show)
 
 create :: FilePath -> FilePath -> [FilePath] -> IO ()
 create tar base paths = BS.readFile tar . write =<< pack base paths
+
+-- write
 
 write :: [Entry] -> LBS.ByteString
 write es = LBS.concat $ map putEntry es ++ [LBS.replicate (512*2) 0]
@@ -137,7 +147,25 @@ putHeaderNoChkSum Entry {
         BlockDevice     _ _ -> putOct w n
         _                   -> replicate w '\NUL'
 
-
 ustarMagic, gnuMagic :: BS.ByteString
 ustarMagic = BS.Char8.pack "ustar\NUL00"
 gnuMagic   = BS.Char8.pack "ustar \NUL"
+
+putBString :: FieldWidth -> BS.ByteString -> String
+putBString n s = BS.Char8.unpack (BS.take n s) ++ fill (n - BS.length s) '\NUL'
+
+putString :: FieldWidth -> String -> String
+putString n s = take n s ++ fill (n - length s) '\NUL'
+
+putOct :: (Integral a, Show a) => FieldWidth -> a -> String
+putOct n x =
+  let octStr = take (n - 1) $ showOct x ""
+  in fill (n - length octStr - 1) '0'
+  ++ octStr ++ putChar8 '\NUL'
+
+putChar8 :: Char -> String
+putChar8 c = [c]
+
+fill :: FieldWidth -> Char -> String
+fill n c = replicate n c
+
