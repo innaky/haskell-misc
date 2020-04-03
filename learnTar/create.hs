@@ -4,14 +4,16 @@ import Data.Monoid (mempty)
 import Numeric     (showOct)
 import Data.List   (foldl')
 import Data.Char   (ord)
+import System.FilePath ((</>))
+import System.Directory (doesDirectoryExist)
+import System.Posix.Type (FileMode)
+import Data.Int (Int64)
 
 import qualified Data.ByteString       as BS
 import qualified Data.ByteString.Char8 as BS.Char8
 import qualified Data.ByteString.Lazy  as LBS
 import qualified Data.ByteString.Lazy  as LBS.Char8
-import Data.Int (Int64)
-import System.Posix.Type (FileMode)
-
+import qualified System.FilePath       as FilePath.Native ( addTrailingPathSeparator)
 
 data Entry = Entry {
   entryTarPath :: {-# UNPACK #-} !TarPath,
@@ -169,3 +171,32 @@ putChar8 c = [c]
 fill :: FieldWidth -> Char -> String
 fill n c = replicate n c
 
+-- pack
+
+pack :: FilePath -> [FilePath] -> IO [Entry]
+pack baseDir paths0 = preparePaths baseDir paths0 >>= packPaths baseDir
+
+preparePaths :: FilePath -> [FilePath] -> IO [FilePath]
+preparePaths baseDir paths =
+  fmap concat $ interleave
+  [ do isDir <- doesDirectoryExist (baseDir (</>) path)
+       if isDir
+         then do entries <- getDirectoryContentsRecursive (baseDir </> path)
+                 let entries' = map (path </>) entries
+                     dir = FilePath.Native.addTrailingPathSeparator path
+                 if null path then return 'entries
+                   else return (dir : entries')
+         else return [path]
+  | path <- paths ]
+
+
+packPaths :: FilePath -> [FilePath] -> IO [Entry]
+packPaths baseDir paths =
+  interleave
+  [ do tarpath <- either fail return (toTarPath isDir relpath)
+       if isDir 
+         then packDirectoryEntry filepath tarpath
+         else packFileEntry filepath tarpath
+  | relpath <- paths
+  , let isDir = FilePath.Native.hasTrailingPathSeparator filepath
+        filepath = baseDir </> relpath ]
