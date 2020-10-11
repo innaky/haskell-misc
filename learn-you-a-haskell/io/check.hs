@@ -1,7 +1,7 @@
 check :: String -> Maybe String
-check [] = Nothing
 check (x:xs) = Just [x]
+check _ = Nothing
 
-checkpol :: [a] -> Maybe [a]
-check [] = Nothing
-check (x:xs) = Just [x]
+checkgen :: [a] -> Maybe [a]
+checkgen (x:_) = Just [x]
+checkgen _ = Nothing
