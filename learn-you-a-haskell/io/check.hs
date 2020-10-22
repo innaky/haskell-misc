@@ -5,3 +5,7 @@ check _ = Nothing
 checkgen :: [a] -> Maybe [a]
 checkgen (x:_) = Just [x]
 checkgen _ = Nothing
+
+checkEmpty :: [[Char]] -> Maybe [[Char]]
+checkEmpty [] = Nothing
+checkEmpty input = Just input
